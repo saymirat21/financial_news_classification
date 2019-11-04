@@ -5,8 +5,8 @@ require_relative '../../articles/import_articles'
 model = Libsvm::Model.load('svm-model.bin')
 # ---- RETRIEVE THE MODEL ----
 
-# ---- PREPARE THE DATA ----
-sentence = 'Минстрой РФ предложил не сравнивать бюджеты Москвы и Башкирии в реновации
+# ---- PROCESS THE ARTICLE ----
+article = 'Минстрой РФ предложил не сравнивать бюджеты Москвы и Башкирии в реновации
 
 Возможности реновации в столице Башкирии по примеру Москвы оценил на встрече с крупными застройщиками региона в Уфе министр строительства России Владимир Якушев. Предложение озвучил бенефициар ПСК-6 Андрей Носков.
 
@@ -26,25 +26,22 @@ sentence = 'Минстрой РФ предложил не сравнивать �
 На встрече поднималась проблема упрощения порядка изъятия жилья у собственников. По словам Якушева, при внесении изменений в ФЗ №151 Минстрой не смог преодолеть лобби по защите прав собственников.
 
 '
-
-sentence.gsub!(/Ё|ё/, 'е')
-sentence.downcase!
-sentence_splitted = sentence.split(/[^а-я]/)
-sentence_splitted.delete_if { |word| word.empty? }
+article.downcase!
+article.gsub!(/ё/, 'е')
 
 matches = []
 
 KEYWORDS.each do |key|
-  counter = 0
-  sentence_splitted.each do |word|
-    counter += 1 if word.match?(key)
-  end
-  matches << counter
+  matches << article.scan(key).length
 end
+# ---- PROCESS THE ARTICLE ----
 
-# ---- PREPARE THE DATA ----
-
-# ---- PERFORM TESTING ----
+# ---- RECOGNIZE ----
 prediction = model.predict( Libsvm::Node.features(matches))
-print "Статья отнесена к категории: ", prediction.to_i == 0 ? "HAM" : "SPAM", "\n"
-# ---- PERFORM TESTING ----
+recognized_category = (prediction == 0 ? 'HAM' : 'SPAM')
+# ---- RECOGNIZE ----
+
+# ---- DISPLAY THE RESULT ----
+puts "Статья классифицирована как: #{recognized_category}"
+# ---- DISPLAY THE RESULT ----
+

@@ -49,23 +49,24 @@ end
 # ---- RECOGNIZE AND COMPOSE APPROVED ARTICLES ----
 
 # ---- NORMALIZE APPROVED ARTICLES ----
-approved_articles_splitted = { ham: [], spam: [] }
-
 approved_articles.each do |category, category_articles|
   category_articles.each do |category_article|
     category_article.downcase!
     category_article.gsub!(/ё/, 'е')
-    category_article_splitted = category_article.split(/[^а-я]/)
-    category_article_splitted.delete_if { |word| word.empty? }
-
-    approved_articles_splitted[category] << category_article_splitted
   end
 end
 # ---- NORMALIZE APPROVED ARTICLES ----
 
 # ---- SAVE APPROVED ARTICLES ----
-File.open('../yaml_data/approved_articles_splitted.yaml', 'w') do |file|
+
+File.open('../yaml_data/approved_articles.yaml', 'w') do |file|
   file.truncate(0)
-  file.write(approved_articles_splitted.to_yaml)
+  file.write(approved_articles.to_yaml)
 end
+
+puts "Начальное количество статей: #{ARTICLES[:ham].concat(ARTICLES[:spam]).length}"
+puts 'Отобрано статей:'
+puts "\tкатегории HAM: #{approved_articles[:ham].length}"
+puts "\tкатегории SPAM: #{approved_articles[:spam].length}"
+puts "\tвсего: #{approved_articles[:ham].concat(approved_articles[:spam]).length}"
 # ---- SAVE APPROVED ARTICLES ----

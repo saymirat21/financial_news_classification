@@ -60,7 +60,7 @@ final_samples.each do |category, units|
   puts "Всего статей: #{amounts[category].to_i}"
   puts "Количество статей отнесенных к ham: #{counters[:ham]} (#{((counters[:ham]/amounts[category])*100).round(2)}%)"
   puts "Количество статей отнесенных к spam: #{counters[:spam]} (#{((counters[:spam]/amounts[category])*100).round(2)}%)"
-  print "\n\n" 
+  print "\n" 
 end
 # ---- RECOGNIZE AND DISPLAY THE RESULTS ----
 

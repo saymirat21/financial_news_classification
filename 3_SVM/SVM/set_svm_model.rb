@@ -3,21 +3,17 @@ require 'libsvm'
 require_relative '../../articles/import_articles'
 
 # ---- RETRIEVE APPROVED ARTICLES ----
-approved_articles_splitted = YAML.load_file('../yaml_data/approved_articles_splitted.yaml')
+approved_articles = YAML.load_file('../yaml_data/approved_articles.yaml')
 # ---- RETRIEVE APPROVED ARTICLES ----
 
-# ---- PROCESS TRAINING DATA SETS ----
+# ---- COMPOSE TRAINING DATA SETS ----
 input, output = [], []
 
-approved_articles_splitted.each do |category, category_articles|
+approved_articles.each do |category, category_articles|
   category_articles.each do |article|
-  matches = []
-  KEYWORDS.each do |key|
-    counter = 0
-    article.each do |word|
-      counter += 1 if word.match?(key)
-    end
-    matches << counter
+    matches = []
+    KEYWORDS.each do |key|
+      matches << article.scan(key).length
     end
   input << matches
   output << (category == :ham ? 0 : 1)
@@ -35,7 +31,7 @@ input.each_with_index do |array, index|
    output_train << output[index] 
   end
 end
-# ---- PROCESS TRAINING DATA SETS ----
+# ---- COMPOSE TRAINING DATA SETS ----
 
 # ---- SET AND TRAIN SVM MODEL ----
 parameter = Libsvm::SvmParameter.new
@@ -53,6 +49,19 @@ problem.set_examples(output_train, input_train)
 model = Libsvm::Model.train(problem, parameter)
 # ---- SET AND TRAIN SVM MODEL ----
 
+# ---- ESTIMATE ACCURACY ON TESTING DATA SET
+false_predictions = 0
+
+input_test.each_with_index do |input_array, index|
+  prediction = model.predict( Libsvm::Node.features(input_array))
+  false_predictions += 1 if prediction.to_i != output_test[index]
+end
+
+puts "Статей в тестовой выборке: #{output_test.length}"
+puts "Неверно классифицированных статей: #{false_predictions}"
+puts "Точность: #{(100 - (false_predictions / output_test.length.to_f)*100).round(5)}%"
+# ---- ESTIMATE ACCURACY ON TESTING DATA SET
+
 # ---- SAVE THE MODEL ----
 model.save('svm-model.bin')
-# ---- SAVE THE MODEL ----
+# ---- SAVE THE MODEL----

@@ -1,41 +1,30 @@
 require 'libsvm'
 require_relative '../../articles/import_articles'
 
-# ---- PREPARE DATA SETS ----
-input, output = [], []
-
-ARTICLES_SPLITTED.each do |category, category_articles|
-  category_articles.each do |article|
-  matches = []
-   KEYWORDS.each do |key|
-     counter = 0
-     article.each do |word|
-        counter += 1 if word.match?(key)
-      end
-     matches << counter
-    end
-  input << matches
-  output << (category == :ham ? 0 : 1)
-  end
-end
-# ---- PREPARE DATA SETS ----
-
-# ---- RETRIEVE THE MODEL ----
+# ---- LOAD THE MODEL AND DATASETS ----
 model = Libsvm::Model.load('svm-model.bin')
-# ---- RETRIEVE THE MODEL ----
+# ---- LOAD THE MODEL AND DATASETS ----
 
-# ---- PERFORM TESTING ----
-false_predictions = { 0 => 0, 1 => 0 }
+# ---- RECOGNIZE AND DISPLAY THE RESULTS ----
+amounts = { spam: ARTICLES[:spam].length.to_f, ham: ARTICLES[:ham].length.to_f }
 
-output.each_with_index do |value, index|
-  prediction = model.predict( Libsvm::Node.features(input[index]))
-  false_predictions[value] += 1 unless prediction.to_i == value
-end
+ARTICLES.each do |category, category_articles|
+  counters = { spam: 0, ham: 0 }
 
-[:ham, :spam].each_with_index do |category, index|
+  category_articles.each do |article|
+    matches = []
+    KEYWORDS.each do |key|
+      matches << article.scan(key).length
+    end
+    prediction = model.predict( Libsvm::Node.features(matches))
+    recognized_category = (prediction.to_i == 0 ? :ham : :spam)
+    counters[recognized_category] += 1
+  end
+
   puts "Категория #{category.upcase}"
-  puts "Количество статей в категории: #{ARTICLES[category].count}"
-  print "Количество неверно классифицированных статей: #{false_predictions[index]}" 
-  print "(#{(false_predictions[index]/ARTICLES[category].count.to_f).round(2)*100}%)\n\n"
+  puts "Всего статей: #{amounts[category].to_i}"
+  puts "Количество статей отнесенных к ham: #{counters[:ham]} (#{((counters[:ham]/amounts[category])*100).round(2)}%)"
+  puts "Количество статей отнесенных к spam: #{counters[:spam]} (#{((counters[:spam]/amounts[category])*100).round(2)}%)"
+  print "\n" 
 end
-# ---- PERFORM TESTING ----
+# ---- RECOGNIZE AND DISPLAY THE RESULTS ----

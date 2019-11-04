@@ -6,12 +6,12 @@ ARTICLES = Hash.new
   inside_folders = Dir.entries("../../articles/#{folder}").select{|folder| !folder.include?('.')}
 
   inside_folders.each do |inside_folder|
-  	txt_files = Dir.glob("../../articles/#{folder}/#{inside_folder}/*.txt") # Array of txt files in an inside folder
-	txt_files.each do |txt_file|
-		file = File.open(txt_file, 'r')
-		ARTICLES[folder] << file.read
-		file.close
-	end
+    txt_files = Dir.glob("../../articles/#{folder}/#{inside_folder}/*.txt") # Array of txt files in an inside folder
+    txt_files.each do |txt_file|
+      file = File.open(txt_file, 'r')
+      ARTICLES[folder] << file.read
+      file.close
+    end
   end
 end
 

@@ -22,18 +22,15 @@ final_samples.each do |category, units|
     
     result = nbayes.classify(article_splitted)
     
-    if result['HAM'] > result['SPAM']
-      counters[:ham] += 1 
-    else
-      counters[:spam] += 1 
-    end 
+    recognized_category = (result.max_class == 'HAM' ? :ham : :spam)
+    counters[recognized_category] += 1
   end
  
   puts "Категория #{category.upcase}"
   puts "Всего статей: #{amounts[category].to_i}"
   puts "Количество статей отнесенных к ham: #{counters[:ham]} (#{((counters[:ham]/amounts[category])*100).round(2)}%)"
   puts "Количество статей отнесенных к spam: #{counters[:spam]} (#{((counters[:spam]/amounts[category])*100).round(2)}%)"
-  print "\n\n" 
+  print "\n" 
 end
 # ---- RECOGNIZE AND DISPLAY THE RESULTS ----
 
