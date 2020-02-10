@@ -33,12 +33,12 @@ input.each_with_index do |array, index|
 end
 # ---- COMPOSE TRAINING DATA SETS ----
 
-# ---- SET AND TRAIN SVM MODEL ----
+# ---- SET AND TRAIN FANN MODEL ----
 train = RubyFann::TrainData.new(inputs: input_train, desired_outputs: output_train)
 
 fann = RubyFann::Standard.new(num_inputs: 45, hidden_neurons: [2, 8, 4, 3, 4], num_outputs: 1)
 fann.train_on_data(train, 1000, 10, 0.1)
-# ---- SET AND TRAIN SVM MODEL ----
+# ---- SET AND TRAIN FANN MODEL ----
 
 # ---- ESTIMATE ACCURACY ON TESTING DATA SET ----
 false_predictions = { 0 => 0, 1 => 0 }
